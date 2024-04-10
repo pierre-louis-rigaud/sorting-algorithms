@@ -1,4 +1,4 @@
-# Implémentation de différents algorithmes de tri en Python
+# Contenu de sorting.py
 
 def tri_selection(arr):
     # Parcours de chaque élément du tableau
@@ -130,16 +130,3 @@ def tri_peigne(arr):
                 sorted = False
             i += 1
     return arr
-
-# Test de fonctionnalité pour chaque algorithme de tri
-test_arr = [64, 34, 25, 12, 22, 11, 90]
-
-print("Input:", test_arr)
-print("Tri par sélection:", tri_selection(test_arr.copy()))
-print("Tri à bulles:", tri_bulles(test_arr.copy()))
-print("Tri par insertion:", tri_insertion(test_arr.copy()))
-print("Tri fusion:", tri_fusion(test_arr.copy()))
-print("Tri rapide:", tri_rapide(test_arr.copy(), 0, len(test_arr)-1))
-print("Tri par tas:", tri_tas(test_arr.copy()))
-print("Tri à peigne:", tri_peigne(test_arr.copy()))
-
