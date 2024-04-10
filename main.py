@@ -1,6 +1,6 @@
 # main.py
 
-import sorting  # Assurez-vous que sorting.py est dans le même répertoire
+import sorting  
 import random
 import time
 
