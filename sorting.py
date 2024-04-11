@@ -39,9 +39,27 @@ def tri_insertion(arr):
     # Implémentation du tri par insertion
     pass
 
-def tri_fusion(arr):
+
     # Implémentation du tri fusion
-    pass
+    
+
+    def tri_fusion(liste):
+        """
+        Trie une liste en utilisant l'algorithme du tri fusion.
+        """
+        if len(liste) <= 1:
+            return liste
+        
+        milieu = len(liste) // 2
+        gauche = liste[:milieu]
+        droite = liste[milieu:]
+
+        # Récursivement trier les sous-listes
+        gauche_triee = tri_fusion(gauche)
+        droite_triee = tri_fusion(droite)
+
+        # Fusionner les sous-listes triées
+        return fusionner(gauche_triee, droite_triee)
 
 def tri_rapide(arr):
     # Implémentation du tri rapide
