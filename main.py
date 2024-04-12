@@ -1,58 +1,178 @@
-# main.py
-
-import sorting  
-import random
+import tkinter as tk
+from tkinter import ttk
 import time
+import random
 
-def generate_random_list(size):
-    """Génère une liste de nombres entiers aléatoires."""
-    return [random.randint(1, 100) for _ in range(size)]
+def selection_sort(arr):
+    """Sorts an array using the selection sort algorithm."""
+    for i in range(len(arr)):
+        min_idx = i
+        for j in range(i+1, len(arr)):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
 
-def execute_sorting(algorithm, arr):
-    """Exécute l'algorithme de tri et mesure le temps d'exécution."""
+def bubble_sort(arr):
+    """Sorts an array using the bubble sort algorithm."""
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if arr[j] > arr[j+1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+    return arr
+
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i-1
+        while j >=0 and key < arr[j] :
+            arr[j+1] = arr[j]
+            j -= 1
+        arr[j+1] = key
+    return arr
+
+def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr)//2
+        L = arr[:mid]
+        R = arr[mid:]
+
+       
+        merge_sort(L)
+        merge_sort(R)
+
+        i = j = k = 0
+
+        while i < len(L) and j < len(R):
+            if L[i] < R[j]:
+                arr[k] = L[i]
+                i += 1
+            else:
+                arr[k] = R[j]
+                j += 1
+            k += 1
+
+        while i < len(L):
+            arr[k] = L[i]
+            i += 1
+            k += 1
+
+        while j < len(R):
+            arr[k] = R[j]
+            j += 1
+            k += 1
+    return arr
+
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    else:
+        pivot = arr[len(arr) // 2]
+        left = [x for x in arr if x < pivot]
+        middle = [x for x in arr if x == pivot]
+        right = [x for x in arr if x > pivot]
+        return quick_sort(left) + middle + quick_sort(right)
+
+def heapify(arr, n, i):
+    largest = i 
+    left = 2 * i + 1 
+    right = 2 * i + 2 
+
+    if left < n and arr[largest] < arr[left]:
+        largest = left
+
+    if right < n and arr[largest] < arr[right]:
+        largest = right
+
+    
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i] 
+        heapify(arr, n, largest)
+
+def heap_sort(arr):
+    n = len(arr)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+    for i in range(n-1, 0, -1):
+        arr[i], arr[0] = arr[0], arr[i] 
+        heapify(arr, i, 0)
+    return arr
+
+
+def comb_sort(arr):
+    gap = len(arr)
+    shrink = 1.3
+    sorted = False
+
+    while not sorted:
+        gap = int(gap // shrink)
+        if gap <= 1:
+            gap = 1
+            sorted = True
+        i = 0
+        while i + gap < len(arr):
+            if arr[i] > arr[i + gap]:
+                arr[i], arr[i + gap] = arr[i + gap], arr[i]
+                sorted = False
+            i += 1
+    return arr
+
+
+def measure_sort_time(sort_function, arr):
     start_time = time.time()
-    sorted_arr = algorithm(arr)
+    sort_function(arr.copy())
     end_time = time.time()
-    return sorted_arr, end_time - start_time
+    return end_time - start_time
 
-def main():
-    print("Algorithmes de tri disponibles :")
-    print("1. Tri par sélection")
-    print("2. Tri à bulles")
-    print("3. Tri par insertion")
-    print("4. Tri fusion")
-    print("5. Tri rapide")
-    print("6. Tri par tas")
-    print("7. Tri à peigne")
-    
-    choice = int(input("Choisissez un algorithme de tri (1-7): "))
-    
-    algorithms = {
-        1: sorting.tri_selection,
-        2: sorting.tri_bulles,
-        3: sorting.tri_insertion,
-        4: sorting.tri_fusion,
-        5: sorting.tri_rapide,
-        6: sorting.tri_tas,
-        7: sorting.tri_peigne,
-    }
-    
-    if choice not in algorithms:
-        print("Choix non valide.")
-        return
-    
-    size = int(input("Entrez la taille de la liste à trier: "))
-    arr = generate_random_list(size)
-    
-    print("Liste non triée :", arr)
-    
-    sorted_arr, time_taken = execute_sorting(algorithms[choice], arr.copy())
-    
-    print("Liste triée :", sorted_arr)
-    print(f"Temps d'exécution : {time_taken:.5f} secondes.")
+def sort_numbers():
+    numbers = list(map(int, numbers_entry.get().split()))
+    algorithm = algorithm_combobox.get()
+    sorted_numbers = []
+    if algorithm == 'Tri par Sélection':
+        sorted_numbers = selection_sort(numbers)
+    elif algorithm == 'Tri à Bulles':
+        sorted_numbers = bubble_sort(numbers)
+    elif algorithm == 'Tri par insertion':
+       sorted_numbers = insertion_sort(numbers)
+    elif algorithm == 'Tri fusion':
+       sorted_numbers = merge_sort(numbers)
+    elif algorithm == 'Tri rapide':
+        sorted_numbers = quick_sort(numbers)
+    elif algorithm == 'Tri par tas':
+       sorted_numbers = heap_sort(numbers)
+    elif algorithm == 'Tri à peigne':
+        sorted_numbers = comb_sort(numbers)
+     
+    result_label.config(text=f"Résultat : {sorted_numbers}")
 
-if __name__ == "__main__":
-    main()
+
+app = tk.Tk()
+app.title("Démonstration de Tri")
+
+
+algorithm_label = tk.Label(app, text="Choisir un algorithme de tri :")
+algorithm_label.pack()
+
+algorithm_combobox = ttk.Combobox(app, values=[
+    "Tri par Sélection", "Tri à Bulles", "Tri par insertion", "Tri fusion", "Tri rapide", "Tri par tas", "Tri à peigne"
+])
+algorithm_combobox.pack()
+
+
+numbers_label = tk.Label(app, text="Entrer les nombres séparés par un espace :")
+numbers_label.pack()
+
+numbers_entry = tk.Entry(app)
+numbers_entry.pack()
+
+sort_button = tk.Button(app, text="Trier", command=sort_numbers)
+sort_button.pack()
+
+result_label = tk.Label(app, text="Résultat :")
+result_label.pack()
+
+app.mainloop()
 
 
 
