@@ -1,43 +1,74 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import tkinter as tk
+from tkinter import ttk
 import random
-from matplotlib.animation import FuncAnimation
 
-# Define the selection sort function with a visual output
-def selection_sort(arr):
-    for i in range(len(arr)):
-        min_idx = i
-        for j in range(i+1, len(arr)):
-            if arr[j] < arr[min_idx]:
-                min_idx = j
-        arr[i], arr[min_idx] = arr[min_idx], arr[i]
-        yield arr  # Yield the array at each step for visualization
+def generate_colors(n):
+    """Generates a list of hexadecimal colors."""
+    return ['#' + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for _ in range(n)]
 
-# Generate random data for sorting
-data = [random.randint(0, 100) for i in range(25)]
+def draw_rectangles(canvas, arr, colors):
+    """Draws rectangles representing sorted values."""
+    canvas.delete("all") 
+    c_width = int(canvas.cget("width"))
+    c_height = int(canvas.cget("height"))
+    bar_width = c_width / len(arr)
+    for i, val in enumerate(arr):
+        x0 = i * bar_width
+        y0 = c_height - (val * c_height / max(arr))  
+        x1 = (i + 1) * bar_width
+        y1 = c_height
+        canvas.create_rectangle(x0, y0, x1, y1, fill=colors[i], outline='white')
 
-fig, ax = plt.subplots()  # Create a figure and a set of subplots
-bar_rects = ax.bar(range(len(data)), data, align="edge")  # Draw initial bars
+def sort_and_draw():
+    """Sorts the numbers and draws the visualization."""
+    numbers = list(map(int, numbers_entry.get().split()))
+    if not numbers:  
+        return
+    colors = generate_colors(len(numbers)) 
+    algorithm = algorithm_combobox.get()
+    sorted_numbers = numbers[:]
+    if algorithm == 'Tri par Sélection':
+        sorted_numbers = selection_sort(sorted_numbers)
+    elif algorithm == 'Tri à Bulles':
+        sorted_numbers = bubble_sort(sorted_numbers)
+    elif algorithm == 'Tri par insertion':
+        sorted_numbers = insertion_sort(sorted_numbers)
+    elif algorithm == 'Tri fusion':
+        sorted_numbers = merge_sort(sorted_numbers)
+    elif algorithm == 'Tri rapide':
+        sorted_numbers = quick_sort(sorted_numbers)
+    elif algorithm == 'Tri par tas':
+        sorted_numbers = heap_sort(sorted_numbers)
+    elif algorithm == 'Tri à peigne':
+        sorted_numbers = comb_sort(sorted_numbers)
+    draw_rectangles(canvas, sorted_numbers, colors)
+    result_label.config(text=f"Résultat : {sorted_numbers}")
 
-# Set the y-axis limit (adjust if necessary)
-ax.set_ylim(0, int(1.1*max(data)))
+app = tk.Tk()
+app.title("Démonstration de Tri")
 
-# Initialize the visualization
-def init():
-    ax.clear()  # Clear the axes
-    plt.xlabel('Index')  # Set the x-axis label
-    plt.ylabel('Valeur')  # Set the y-axis label
-    plt.title('Tri par Sélection')  # Set the title
-    bar_rects = plt.bar(range(len(data)), data, align="edge", color="blue")  # Redraw bars
-    return bar_rects
+canvas = tk.Canvas(app, width=600, height=400)
+canvas.pack()
 
-# Animation update function to update the visualization
-def update_fig(A, rects, iteration):
-    for rect, val in zip(rects, A):  # Update each bar's height
-        rect.set_height(val)
-    iteration[0] += 1
+algorithm_label = tk.Label(app, text="Choisir un algorithme de tri :")
+algorithm_label.pack()
 
-# Create the animation
-ani = FuncAnimation(fig, func=update_fig, fargs=(bar_rects, [0]), frames=selection_sort(data), init_func=init, interval=1, repeat=False)
+algorithm_combobox = ttk.Combobox(app, values=[
+    "Tri par Sélection", "Tri à Bulles", "Tri par insertion", "Tri fusion", "Tri rapide", "Tri par tas", "Tri à peigne"
+])
+algorithm_combobox.set("Tri par Sélection")  
+algorithm_combobox.pack()
 
-plt.show()  # Display the plot
+numbers_label = tk.Label(app, text="Entrer les nombres séparés par un espace :")
+numbers_label.pack()
+
+numbers_entry = tk.Entry(app)
+numbers_entry.pack()
+
+sort_button = tk.Button(app, text="Trier et dessiner", command=sort_and_draw)
+sort_button.pack()
+
+result_label = tk.Label(app, text="Résultat :")
+result_label.pack()
+
+app.mainloop()
